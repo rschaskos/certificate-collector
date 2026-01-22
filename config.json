@@ -1,0 +1,69 @@
+{
+  "version": "4.0",
+  "urls": {
+    "fgts": "https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf",
+    "estadual": "http://www.cdw.fazenda.pr.gov.br/cdw/emissao/certidaoAutomatica",
+    "federal": "https://solucoes.receita.fazenda.gov.br/Servicos/certidaointernet/PJ/Consultar",
+    "trabalhista": "https://www.tst.jus.br/certidao1",
+    "trabalhista_direct": "https://cndt-certidao.tst.jus.br/gerarCertidao.faces",
+    "simples": "https://www8.receita.fazenda.gov.br/simplesnacional/aplicacoes.aspx?id=21",
+    "tce": "https://www1.tce.pr.gov.br/conteudo/consultar-certidao-liberatoria/235540/area/54"
+  },
+  "selectors": {
+    "fgts": {
+      "cnpj_input": "#mainForm\\:txtInscricao1",
+      "captcha_input": "#mainForm\\:txtCaptcha",
+      "submit_button": "#mainForm\\:btnConsultar",
+      "error_message": "#mainForm > div.ui-messages-error",
+      "razao_social": "#mainForm > div:nth-of-type(3) > p > span:nth-of-type(2)",
+      "checkbox": "#mainForm\\:j_id51",
+      "download_button": "#mainForm\\:btnVisualizar"
+    },
+    "estadual": {
+      "cnpj_input": "#EmissaoCnpj",
+      "submit_button": "#submitBtn",
+      "error_message": "#msg",
+      "download_link": "#pdf a"
+    },
+    "federal": {
+      "cnpj_input": "input[name='ni']",
+      "data_inicio_input": "input[name='dtInicio']",
+      "data_fim_input": "input[name='dtFim']",
+      "emitir_button": "button[type='submit']",
+      "download_link": "a[href*='certidao']"
+    },
+    "trabalhista": {
+      "cnpj_input": "#gerarCertidaoForm\\:cpfCnpj",
+      "captcha_input": "#idCampoResposta",
+      "submit_button": "#gerarCertidaoForm\\:btnEmitirCertidao",
+      "error_message": "#mensagens li",
+      "success_indicator": "embed[type='application/pdf']"
+    },
+    "simples": {
+      "cnpj_input": "input[name='txtCNPJ']",
+      "consultar_button": "input[value='Consultar']",
+      "imprimir_button": "input[value='Imprimir']"
+    },
+    "tce": {
+      "cnpj_input": "input[id*='cnpj']",
+      "consultar_button": "input[type='submit'][value*='Consultar']",
+      "emitir_button": "input[type='button'][value*='Emitir']"
+    }
+  },
+  "timeouts": {
+    "default_wait": 10000,
+    "download_wait": 30000,
+    "captcha_wait": 120000,
+    "page_load": 15000
+  },
+  "paths": {
+    "downloads": "./downloads",
+    "logs": "./logs"
+  },
+  "settings": {
+    "max_captcha_retries": 3,
+    "browser_headless": false,
+    "browser_timeout": 60000,
+    "log_level": "INFO"
+  }
+}

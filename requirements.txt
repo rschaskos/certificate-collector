@@ -1,11 +1,9 @@
-# Core dependencies
-selenium>=4.16.0
-customtkinter>=5.2.0
-pyautogui>=0.9.54
-pygetwindow>=0.0.9
+# Core dependencies - v4.0
+PySide6>=6.6.0
+playwright>=1.40.0
 
-# Optional: Uncomment if migrating to Playwright
-# playwright>=1.40.0
-
-# Optional: Uncomment if migrating to PySide6
-# PySide6>=6.6.0
+# Legacy dependencies (will be removed)
+# selenium>=4.16.0
+# customtkinter>=5.2.0
+# pyautogui>=0.9.54
+# pygetwindow>=0.0.9
