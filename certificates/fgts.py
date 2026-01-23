@@ -29,16 +29,31 @@ class FGTSCertificate(BaseCertificate):
             if not self.navigate():
                 return False
 
-            # Fill CNPJ
-            if not self.fill_input(self.selectors['cnpj_input'], self.cnpj):
+            # Wait for page to fully load
+            self.human_delay(1500, 2500)
+
+            # Wait for form
+            if not self.wait_for_selector(self.selectors['cnpj_input'], timeout=10000):
+                self.logger.error('CNPJ input not found')
                 return False
 
+            # Small delay before typing
+            self.human_delay(500, 1000)
+
+            # Fill CNPJ slowly
+            self.logger.info('Filling CNPJ...')
+            self.slow_type(self.selectors['cnpj_input'], self.cnpj)
+
+            self.human_delay(800, 1200)
+
             # Submit form (no CAPTCHA needed)
+            self.human_delay(500, 1000)
             if not self.click_element(self.selectors['submit_button']):
                 return False
 
             # Wait for response
             self.page.wait_for_load_state('networkidle', timeout=10000)
+            self.human_delay(1000, 1500)
 
             # Check for error message
             error_msg = self.check_error_message(self.selectors['error_message'])
@@ -55,9 +70,13 @@ class FGTSCertificate(BaseCertificate):
             else:
                 razao_social = self.cnpj
 
+            self.human_delay(500, 1000)
+
             # Check the acceptance checkbox
             if not self.click_element(self.selectors['checkbox']):
                 self.logger.warning('Failed to click checkbox, continuing anyway...')
+
+            self.human_delay(500, 1000)
 
             # Click "Visualizar" button to load the certificate view
             if not self.click_element(self.selectors['visualizar_button']):
@@ -68,13 +87,12 @@ class FGTSCertificate(BaseCertificate):
             self.page.wait_for_load_state('networkidle', timeout=15000)
 
             # Wait for the print button to appear (indicates certificate is ready)
-            # This is the "Imprimir" button that only shows on the certificate page
             self.logger.info('Waiting for certificate page to fully render...')
             if not self.wait_for_selector(self.selectors['print_button'], timeout=15000):
                 self.logger.warning('Print button not found, but continuing...')
 
             # Additional wait to ensure page is fully rendered
-            self.page.wait_for_timeout(2000)
+            self.human_delay(2000, 3000)
 
             # Save certificate page as PDF (avoids print dialog)
             timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')

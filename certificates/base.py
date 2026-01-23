@@ -3,6 +3,7 @@ Base certificate class for Certificate Collector v4.0
 Abstract base class that all certificate implementations inherit from.
 """
 
+import random
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
@@ -35,6 +36,33 @@ class BaseCertificate(ABC):
         self.url = self.config.get_url(self.cert_type)
         self.selectors = self.config.get_selectors(self.cert_type)
         self.timeout = self.config.get_timeout('default_wait')
+
+    def human_delay(self, min_ms: int = 500, max_ms: int = 1500):
+        """
+        Add random delay to simulate human behavior.
+
+        Args:
+            min_ms: Minimum delay in milliseconds
+            max_ms: Maximum delay in milliseconds
+        """
+        delay = random.randint(min_ms, max_ms)
+        self.page.wait_for_timeout(delay)
+
+    def slow_type(self, selector: str, text: str, delay_min: int = 50, delay_max: int = 150):
+        """
+        Type text slowly like a human.
+
+        Args:
+            selector: CSS selector or XPath
+            text: Text to type
+            delay_min: Minimum delay between keystrokes in ms
+            delay_max: Maximum delay between keystrokes in ms
+        """
+        element = self.page.locator(selector)
+        element.click()
+        self.human_delay(300, 600)
+        # Type with random delay between keystrokes
+        element.type(text, delay=random.randint(delay_min, delay_max))
 
     @abstractmethod
     def _get_cert_type(self) -> str:

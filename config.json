@@ -3,7 +3,7 @@
   "urls": {
     "fgts": "https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf",
     "estadual": "https://cdwfazenda.paas.pr.gov.br/cdwportal/certidao/automatica",
-    "federal": "https://solucoes.receita.fazenda.gov.br/Servicos/certidaointernet/PJ/Consultar",
+    "federal": "https://servicos.receitafederal.gov.br/servico/certidoes/#/home/cnpj",
     "trabalhista": "https://www.tst.jus.br/certidao1",
     "trabalhista_direct": "https://cndt-certidao.tst.jus.br/gerarCertidao.faces",
     "simples": "https://www8.receita.fazenda.gov.br/simplesnacional/aplicacoes.aspx?id=21",
@@ -26,11 +26,10 @@
       "download_button": "i:has-text('file_save')"
     },
     "federal": {
-      "cnpj_input": "input[name='ni']",
-      "data_inicio_input": "input[name='dtInicio']",
-      "data_fim_input": "input[name='dtFim']",
-      "emitir_button": "button[type='submit']",
-      "download_link": "a[href*='certidao']"
+      "cnpj_input": "br-input[placeholder='Informe o CNPJ'] input",
+      "consultar_button": "button.secondary:has-text('Consultar Certidão')",
+      "data_input": "input[placeholder='Selecione a data']",
+      "submit_button": "button[type='submit']:has-text('Consultar Certidão')"
     },
     "trabalhista": {
       "cnpj_input": "[id='gerarCertidaoForm:cpfCnpj']",

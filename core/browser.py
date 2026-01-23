@@ -43,24 +43,123 @@ class BrowserManager:
             self._playwright_context = sync_playwright().start()
             self.playwright = self._playwright_context
 
-            # Launch browser (Chromium)
-            self.browser = self.playwright.chromium.launch(
+            # User data directory for persistent profile (like a real user)
+            user_data_dir = Path('./browser_profile')
+            user_data_dir.mkdir(exist_ok=True)
+
+            # Use persistent context (keeps cookies, history, etc.)
+            self.context = self.playwright.chromium.launch_persistent_context(
+                user_data_dir=str(user_data_dir),
                 headless=headless,
-                args=['--start-maximized']
+                channel='msedge',
+                args=[
+                    '--start-maximized',
+                    '--disable-blink-features=AutomationControlled',
+                    '--no-sandbox',
+                    '--disable-infobars',
+                    '--disable-dev-shm-usage',
+                    '--disable-browser-side-navigation',
+                    '--disable-gpu',
+                    '--disable-extensions',
+                    '--no-first-run',
+                    '--no-default-browser-check',
+                    '--disable-popup-blocking'
+                ],
+                viewport=None,
+                accept_downloads=True,
+                locale='pt-BR',
+                timezone_id='America/Sao_Paulo',
+                user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0',
+                ignore_https_errors=True
             )
 
-            # Create context with download settings
-            self.context = self.browser.new_context(
-                viewport=None,  # Use full screen
-                accept_downloads=True
-            )
+            # Comprehensive anti-detection script
+            self.context.add_init_script("""
+                // Remove webdriver property
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => undefined
+                });
+
+                // Override plugins to look real
+                Object.defineProperty(navigator, 'plugins', {
+                    get: () => [
+                        { name: 'PDF Viewer', filename: 'internal-pdf-viewer' },
+                        { name: 'Chrome PDF Viewer', filename: 'internal-pdf-viewer' },
+                        { name: 'Chromium PDF Viewer', filename: 'internal-pdf-viewer' },
+                        { name: 'Microsoft Edge PDF Viewer', filename: 'internal-pdf-viewer' },
+                        { name: 'WebKit built-in PDF', filename: 'internal-pdf-viewer' }
+                    ]
+                });
+
+                // Override languages
+                Object.defineProperty(navigator, 'languages', {
+                    get: () => ['pt-BR', 'pt', 'en-US', 'en']
+                });
+
+                // Override platform
+                Object.defineProperty(navigator, 'platform', {
+                    get: () => 'Win32'
+                });
+
+                // Override hardwareConcurrency
+                Object.defineProperty(navigator, 'hardwareConcurrency', {
+                    get: () => 8
+                });
+
+                // Override deviceMemory
+                Object.defineProperty(navigator, 'deviceMemory', {
+                    get: () => 8
+                });
+
+                // Override connection
+                Object.defineProperty(navigator, 'connection', {
+                    get: () => ({
+                        effectiveType: '4g',
+                        rtt: 50,
+                        downlink: 10,
+                        saveData: false
+                    })
+                });
+
+                // Remove automation indicators from Chrome object
+                if (window.chrome) {
+                    window.chrome.runtime = {
+                        PlatformOs: { MAC: 'mac', WIN: 'win', ANDROID: 'android', CROS: 'cros', LINUX: 'linux', OPENBSD: 'openbsd' },
+                        PlatformArch: { ARM: 'arm', X86_32: 'x86-32', X86_64: 'x86-64' },
+                        PlatformNaclArch: { ARM: 'arm', X86_32: 'x86-32', X86_64: 'x86-64' },
+                        RequestUpdateCheckStatus: { THROTTLED: 'throttled', NO_UPDATE: 'no_update', UPDATE_AVAILABLE: 'update_available' },
+                        OnInstalledReason: { INSTALL: 'install', UPDATE: 'update', CHROME_UPDATE: 'chrome_update', SHARED_MODULE_UPDATE: 'shared_module_update' },
+                        OnRestartRequiredReason: { APP_UPDATE: 'app_update', OS_UPDATE: 'os_update', PERIODIC: 'periodic' }
+                    };
+                }
+
+                // Override permissions query
+                const originalQuery = window.navigator.permissions.query;
+                window.navigator.permissions.query = (parameters) => (
+                    parameters.name === 'notifications' ?
+                        Promise.resolve({ state: Notification.permission }) :
+                        originalQuery(parameters)
+                );
+
+                // Make toString() return native code for overridden functions
+                const nativeToString = Function.prototype.toString;
+                Function.prototype.toString = function() {
+                    if (this === window.navigator.permissions.query) {
+                        return 'function query() { [native code] }';
+                    }
+                    return nativeToString.call(this);
+                };
+            """)
 
             # Set default timeout
             timeout = self.config.get_timeout('browser_timeout')
             self.context.set_default_timeout(timeout)
 
-            # Create page
-            self.page = self.context.new_page()
+            # Get or create page
+            if self.context.pages:
+                self.page = self.context.pages[0]
+            else:
+                self.page = self.context.new_page()
 
             self.logger.info('Browser started successfully')
             return self.page
@@ -81,9 +180,8 @@ class BrowserManager:
                 self.context.close()
                 self.context = None
 
-            if self.browser:
-                self.browser.close()
-                self.browser = None
+            # No separate browser when using persistent context
+            self.browser = None
 
             if self._playwright_context:
                 self._playwright_context.stop()

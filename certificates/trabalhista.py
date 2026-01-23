@@ -30,13 +30,22 @@ class TrabalhistaCertificate(BaseCertificate):
                 self.logger.info(f'Navigating to {direct_url}')
                 self.page.goto(direct_url, wait_until='domcontentloaded')
 
+                # Wait for page to fully load
+                self.human_delay(1500, 2500)
+
                 # Wait for form to load
                 if not self.wait_for_selector(self.selectors['cnpj_input'], timeout=10000):
+                    self.logger.error('CNPJ input not found')
                     return False
 
-                # Fill CNPJ
-                if not self.fill_input(self.selectors['cnpj_input'], self.cnpj):
-                    return False
+                # Small delay before typing
+                self.human_delay(500, 1000)
+
+                # Fill CNPJ slowly
+                self.logger.info('Filling CNPJ...')
+                self.slow_type(self.selectors['cnpj_input'], self.cnpj)
+
+                self.human_delay(800, 1200)
 
                 # Request CAPTCHA from user via callback (page is visible now)
                 captcha_callback = self.extra_data.get('captcha_callback')
@@ -51,16 +60,23 @@ class TrabalhistaCertificate(BaseCertificate):
                     self.logger.warning('CAPTCHA not provided by user')
                     return False
 
-                # Fill CAPTCHA
-                if not self.fill_input(self.selectors['captcha_input'], captcha):
-                    return False
+                # Small delay before typing CAPTCHA
+                self.human_delay(500, 1000)
+
+                # Fill CAPTCHA slowly
+                self.logger.info('Filling CAPTCHA...')
+                self.slow_type(self.selectors['captcha_input'], captcha)
+
+                self.human_delay(800, 1200)
 
                 # Submit form
+                self.human_delay(500, 1000)
                 if not self.click_element(self.selectors['submit_button']):
                     return False
 
                 # Wait for response
                 self.page.wait_for_load_state('networkidle', timeout=10000)
+                self.human_delay(1500, 2500)
 
                 # Check for CAPTCHA error
                 error_msg = self.check_error_message(self.selectors['error_message'])
@@ -78,12 +94,15 @@ class TrabalhistaCertificate(BaseCertificate):
                 if self.wait_for_selector(self.selectors['success_indicator'], timeout=10000):
                     self.logger.info('Certificate generated successfully')
 
+                    # Wait for PDF to fully load
+                    self.human_delay(2000, 3000)
+
                     # Save the page as PDF
                     timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
                     filename = f'Trabalhista_{self.cnpj}_{timestamp}.pdf'
                     filepath = self.config.get_path('downloads') / filename
 
-                    self.page.pdf(path=str(filepath))
+                    self.page.pdf(path=str(filepath), format='A4', print_background=True)
                     self.logger.info(f'Trabalhista certificate downloaded successfully: {filename}')
                     return True
                 else:

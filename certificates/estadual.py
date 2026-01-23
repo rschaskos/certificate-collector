@@ -26,22 +26,33 @@ class EstadualCertificate(BaseCertificate):
             if not self.navigate():
                 return False
 
+            # Wait for page to fully load
+            self.human_delay(1500, 2500)
+
             # Wait for the form to load
             if not self.wait_for_selector(self.selectors['cnpj_input'], timeout=10000):
                 self.logger.error('CNPJ input field not found')
                 self.take_screenshot('estadual_no_cnpj_input')
                 return False
 
-            # Fill CNPJ
-            if not self.fill_input(self.selectors['cnpj_input'], self.cnpj):
-                return False
+            # Small delay before typing
+            self.human_delay(500, 1000)
+
+            # Fill CNPJ slowly
+            self.logger.info('Filling CNPJ...')
+            self.slow_type(self.selectors['cnpj_input'], self.cnpj)
+
+            self.human_delay(800, 1200)
 
             # Click submit button
+            self.human_delay(500, 1000)
             if not self.click_element(self.selectors['submit_button']):
                 return False
 
             # Wait for modal with table to appear
             self.logger.info('Waiting for certificates modal...')
+            self.human_delay(1500, 2500)
+
             if not self.wait_for_selector(self.selectors['modal_table'], timeout=15000):
                 self.logger.error('Modal with certificates table not found')
                 self.take_screenshot('estadual_no_modal')
@@ -51,7 +62,7 @@ class EstadualCertificate(BaseCertificate):
             self.take_screenshot('estadual_after_submit')
 
             # Wait a moment for table to fully render
-            self.page.wait_for_timeout(1000)
+            self.human_delay(1000, 1500)
 
             # Click download button of first row (most recent certificate)
             download_button = self.selectors['download_button']
@@ -61,6 +72,7 @@ class EstadualCertificate(BaseCertificate):
                 return False
 
             # Download PDF
+            self.human_delay(500, 1000)
             self.logger.info('Clicking download button...')
             with self.page.expect_download(timeout=self.config.get_timeout('download_wait')) as download_info:
                 self.page.locator(download_button).first.click()

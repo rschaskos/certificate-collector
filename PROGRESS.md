@@ -10,10 +10,53 @@
 |----------|--------|-------------|
 | FGTS | ✅ Funcionando | Sem CAPTCHA, usa `page.pdf()` |
 | ESTADUAL | ✅ Funcionando | Modal com tabela, download via ícone `file_save` |
-| RECEITA FEDERAL | ⏳ Pendente | Testar (pede data inicial) |
+| RECEITA FEDERAL | 🔄 Em andamento | Site detecta automação - testar com Selenium/undetected-chromedriver |
 | TRABALHISTA | ⏳ Pendente | Testar (tem CAPTCHA) |
 | SIMPLES NACIONAL | ⏳ Pendente | Testar |
 | TCE-PR | ⏳ Pendente | Testar |
+
+---
+
+## Problema: Certidão Federal (Receita Federal)
+
+**Status:** Bloqueado por detecção de bot
+
+**URL:** `https://servicos.receitafederal.gov.br/servico/certidoes/#/home/cnpj`
+
+**Erro:** "Não foi possível concluir a ação para o contribuinte informado. Por favor, tente novamente dentro de alguns minutos."
+
+**O que já foi tentado:**
+1. ✅ Seletores funcionando (CNPJ preenchido, botões clicados)
+2. ❌ Chromium padrão - detectado
+3. ❌ Chrome real (`channel='chrome'`) - detectado
+4. ❌ Edge real (`channel='msedge'`) - detectado
+5. ❌ Perfil persistente (`launch_persistent_context`) - detectado
+6. ❌ Scripts anti-detecção (webdriver, plugins, etc.) - detectado
+
+**Próximos passos para resolver:**
+- [ ] Testar com Selenium + undetected-chromedriver
+- [ ] Testar com perfil de usuário real do Edge/Chrome
+- [ ] Investigar se há API pública da Receita Federal
+
+**Fluxo implementado (funciona até ser bloqueado):**
+```
+1. Preenche CNPJ (slow_type)
+2. Clica "Consultar Certidão" (botão secundário)
+3. Aguarda campo de data aparecer
+4. Preenche data inicial (do diálogo PySide)
+5. Clica "Consultar Certidão" (submit)
+6. Salva PDF
+```
+
+**Seletores (config.json):**
+```json
+"federal": {
+  "cnpj_input": "br-input[placeholder='Informe o CNPJ'] input",
+  "consultar_button": "button.secondary:has-text('Consultar Certidão')",
+  "data_input": "input[placeholder='Selecione a data']",
+  "submit_button": "button[type='submit']:has-text('Consultar Certidão')"
+}
+```
 
 ---
 
@@ -45,29 +88,47 @@
 
 ---
 
+## Fluxo Estadual PR (Completo)
+
+```
+1. Preenche CNPJ
+2. Clica "EMITIR CERTIDÃO"
+3. Aguarda modal com tabela de certidões aparecer
+4. Clica no ícone de download (file_save) da primeira linha
+5. Salva PDF baixado
+```
+
+### Seletores Estadual (config.json)
+```json
+"estadual": {
+  "cnpj_input": "role=textbox[name='CPF ou CNPJ do requerente']",
+  "submit_button": "button:has-text('EMITIR CERTIDÃO')",
+  "modal_table": "table tbody tr",
+  "download_button": "i:has-text('file_save')"
+}
+```
+
+---
+
 ## Decisões Técnicas
 
-### 1. Remoção do CAPTCHA do FGTS
-- O site do FGTS não exige mais CAPTCHA
-- Removido callback de CAPTCHA para FGTS
-- Apenas TRABALHISTA ainda usa CAPTCHA
+### 1. Métodos anti-detecção na classe base
+- `human_delay(min_ms, max_ms)` - Delays aleatórios entre ações
+- `slow_type(selector, text)` - Digitação lenta caractere por caractere
+- Disponíveis para todas as certidões via `BaseCertificate`
 
-### 2. Estratégia de Download PDF
-- **Não clicar no botão "Imprimir"** (evita diálogo do sistema)
-- Usar `page.pdf()` diretamente na página do certificado
-- Mais confiável e funciona em modo headless
+### 2. Browser com perfil persistente
+- Usa `launch_persistent_context` para manter cookies/histórico
+- Pasta `./browser_profile`
+- Scripts anti-detecção (webdriver, plugins, languages, etc.)
 
-### 3. Espera pela Página
-- `wait_for_load_state('networkidle')` não é suficiente
-- Solução: esperar elemento específico aparecer (botão Imprimir)
-- Adicionar `wait_for_timeout(2000)` para garantir renderização
-
-### 4. Conversão de Seletores (Playwright Codegen → config.json)
+### 3. Conversão de Seletores (Playwright Codegen → config.json)
 | Codegen | config.json |
 |---------|-------------|
 | `get_by_role("button", name="X")` | `role=button[name='X']` |
 | `get_by_text("X")` | `text=X` |
 | `get_by_label("X")` | `label=X` |
+| `get_by_placeholder("X")` | `[placeholder='X']` |
 
 ---
 
@@ -81,30 +142,33 @@ certificate-collector/
 │   ├── main_window.py      # Interface principal
 │   └── dialogs.py          # Diálogos (CNPJ, CAPTCHA, Data)
 ├── certificates/
-│   ├── base.py             # Classe base abstrata
+│   ├── base.py             # Classe base (human_delay, slow_type)
 │   ├── fgts.py             # ✅ Funcionando
-│   ├── estadual.py         # ⏳ Testar
-│   ├── federal.py          # ⏳ Testar
+│   ├── estadual.py         # ✅ Funcionando
+│   ├── federal.py          # 🔄 Bloqueado por detecção
 │   ├── trabalhista.py      # ⏳ Testar
 │   ├── simples.py          # ⏳ Testar
 │   └── tce.py              # ⏳ Testar
 ├── core/
-│   ├── browser.py          # Gerenciador do Playwright
+│   ├── browser.py          # Gerenciador do Playwright (anti-detecção)
 │   ├── config.py           # Carrega config.json
 │   └── logger.py           # Sistema de logs
-└── downloads/              # PDFs salvos aqui
+├── browser_profile/        # Perfil persistente do navegador
+├── downloads/              # PDFs salvos aqui
+├── logs/                   # Logs diários
+└── screenshots/            # Screenshots de debug
 ```
 
 ---
 
 ## Próximos Passos
 
-1. [ ] Testar certidão ESTADUAL
-2. [ ] Testar certidão RECEITA FEDERAL
+1. [x] Testar certidão ESTADUAL
+2. [ ] **PAUSADO** - Certidão RECEITA FEDERAL (detecção de bot)
 3. [ ] Testar certidão TRABALHISTA (com CAPTCHA)
 4. [ ] Testar certidão SIMPLES NACIONAL
 5. [ ] Testar certidão TCE-PR
-6. [ ] Ajustar seletores conforme necessário (usar `playwright codegen`)
+6. [ ] Voltar para FEDERAL com Selenium/undetected-chromedriver
 
 ---
 
@@ -117,9 +181,6 @@ python main.py
 
 # Descobrir seletores com Playwright Codegen
 playwright codegen https://URL_DO_SITE
-
-# Exemplo FGTS:
-playwright codegen https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf
 ```
 
 ---
@@ -131,3 +192,4 @@ playwright codegen https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaE
 - PDFs são salvos na pasta `downloads/`
 - Logs ficam na pasta `logs/`
 - Modo headless está **desativado** (browser_headless: false)
+- Browser usa **Microsoft Edge** com perfil persistente
