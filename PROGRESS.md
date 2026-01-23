@@ -12,7 +12,7 @@
 | ESTADUAL | ✅ Funcionando | Modal com tabela, download via ícone `file_save` |
 | RECEITA FEDERAL | 🔄 Em andamento | Site detecta automação - testar com Selenium/undetected-chromedriver |
 | TRABALHISTA | ✅ Funcionando | CAPTCHA manual + download automático |
-| SIMPLES NACIONAL | ⏳ Pendente | Testar |
+| SIMPLES NACIONAL | ❌ Bloqueado | Site detecta automação - "Comportamento de Robô" |
 | TCE-PR | ⏳ Pendente | Testar |
 
 ---
@@ -133,6 +133,37 @@
 
 ---
 
+## Problema: Simples Nacional
+
+**Status:** Bloqueado por detecção de bot (hCaptcha)
+
+**URL:** `https://www8.receita.fazenda.gov.br/simplesnacional/aplicacoes.aspx?id=21`
+
+**Erro:** "Impedido por proteção Captcha. Comportamento de Robô."
+
+**O que já foi tentado:**
+1. ✅ Seletores funcionando (CNPJ preenchido)
+2. ❌ Edge com perfil persistente - detectado
+3. ❌ Scripts anti-detecção - detectado
+
+**Fluxo implementado (funciona até ser bloqueado):**
+```
+1. Navega para página
+2. Preenche CNPJ
+3. Clica "Consultar" → BLOQUEADO (hCaptcha detecta robô)
+```
+
+### Seletores Simples Nacional (config.json)
+```json
+"simples": {
+  "cnpj_input": "#Cnpj",
+  "consultar_button": "button:has-text('Consultar')",
+  "gerar_pdf_button": "#GerarPDF"
+}
+```
+
+---
+
 ## Decisões Técnicas
 
 ### 1. Métodos anti-detecção na classe base
@@ -169,8 +200,8 @@ certificate-collector/
 │   ├── fgts.py             # ✅ Funcionando
 │   ├── estadual.py         # ✅ Funcionando
 │   ├── federal.py          # 🔄 Bloqueado por detecção
-│   ├── trabalhista.py      # ⏳ Testar
-│   ├── simples.py          # ⏳ Testar
+│   ├── trabalhista.py      # ✅ Funcionando
+│   ├── simples.py          # ❌ Bloqueado por detecção
 │   └── tce.py              # ⏳ Testar
 ├── core/
 │   ├── browser.py          # Gerenciador do Playwright (anti-detecção)
@@ -187,11 +218,11 @@ certificate-collector/
 ## Próximos Passos
 
 1. [x] Testar certidão ESTADUAL
-2. [ ] **PAUSADO** - Certidão RECEITA FEDERAL (detecção de bot)
-3. [ ] Testar certidão TRABALHISTA (com CAPTCHA)
-4. [ ] Testar certidão SIMPLES NACIONAL
+2. [x] Testar certidão TRABALHISTA (com CAPTCHA) - ✅ Funcionando
+3. [ ] **PAUSADO** - Certidão RECEITA FEDERAL (detecção de bot)
+4. [ ] **PAUSADO** - Certidão SIMPLES NACIONAL (detecção de bot)
 5. [ ] Testar certidão TCE-PR
-6. [ ] Voltar para FEDERAL com Selenium/undetected-chromedriver
+6. [ ] Voltar para FEDERAL e SIMPLES com Selenium/undetected-chromedriver
 
 ---
 

@@ -38,9 +38,9 @@
       "error_message": "#mensagens li"
     },
     "simples": {
-      "cnpj_input": "input[name='txtCNPJ']",
-      "consultar_button": "input[value='Consultar']",
-      "imprimir_button": "input[value='Imprimir']"
+      "cnpj_input": "input.form-control",
+      "consultar_button": "button:has-text('Consultar')",
+      "gerar_pdf_button": "#GerarPDF"
     },
     "tce": {
       "cnpj_input": "input[id*='cnpj']",

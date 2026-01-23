@@ -1,6 +1,6 @@
-2026/01/23-16:55:28.682 3a98 Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
-2026/01/23-16:55:28.683 3a98 Recovering log #4
-2026/01/23-16:55:28.684 3a98 Reusing old log C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/000004.log 
-2026/01/23-16:55:28.807 2414 Level-0 table #8: started
-2026/01/23-16:55:28.820 2414 Level-0 table #8: 681376 bytes OK
-2026/01/23-16:55:28.825 2414 Delete type=0 #4
+2026/01/23-17:30:36.072 2388 Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/01/23-17:30:36.073 2388 Recovering log #19
+2026/01/23-17:30:36.074 2388 Reusing old log C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/000019.log 
+2026/01/23-17:30:36.150 40b0 Level-0 table #24: started
+2026/01/23-17:30:36.157 40b0 Level-0 table #24: 681376 bytes OK
+2026/01/23-17:30:36.163 40b0 Delete type=0 #19
