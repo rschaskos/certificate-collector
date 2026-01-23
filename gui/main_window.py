@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QComboBox, QPushButton, QTextEdit, QLabel, QProgressBar,
     QMessageBox, QGroupBox
 )
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QTextCursor
 from core.logger import get_logger
 from core.config import get_config
@@ -21,76 +21,6 @@ from certificates.simples import SimplesNacionalCertificate
 from certificates.tce import TCECertificate
 
 
-class CertificateWorker(QThread):
-    """Worker thread for certificate generation to avoid blocking UI."""
-
-    finished = Signal(bool, str)  # success, message
-    progress = Signal(int, str)  # progress percentage, status message
-    log_message = Signal(str, str)  # message, level (INFO, ERROR, etc.)
-    captcha_needed = Signal(str)  # certificate type
-
-    def __init__(self, cert_type, cnpj, extra_data=None):
-        super().__init__()
-        self.cert_type = cert_type
-        self.cnpj = cnpj
-        self.extra_data = extra_data or {}
-        self.logger = get_logger('CertificateWorker')
-        self.browser_manager = None
-        self._captcha_response = None
-
-    def set_captcha(self, captcha: str):
-        """Set CAPTCHA from main thread."""
-        self._captcha_response = captcha
-
-    def run(self):
-        """Execute certificate generation in background thread."""
-        try:
-            self.log_message.emit(f'Iniciando geração: {self.cert_type}', 'INFO')
-
-            # Start browser
-            self.browser_manager = BrowserManager()
-            page = self.browser_manager.start()
-
-            # Create certificate instance
-            cert_class = self._get_certificate_class()
-            if not cert_class:
-                self.finished.emit(False, f'Tipo de certidão inválido: {self.cert_type}')
-                return
-
-            certificate = cert_class(self.cnpj, page, self.extra_data)
-
-            # Generate certificate
-            success = certificate.generate()
-
-            if success:
-                self.log_message.emit(f'Certidão {self.cert_type} gerada com sucesso!', 'SUCCESS')
-                self.finished.emit(True, f'Certidão {self.cert_type} gerada com sucesso!')
-            else:
-                self.log_message.emit(f'Falha ao gerar certidão {self.cert_type}', 'ERROR')
-                self.finished.emit(False, f'Falha ao gerar certidão {self.cert_type}')
-
-        except Exception as e:
-            self.logger.error(f'Error in worker thread: {e}', exc_info=True)
-            self.log_message.emit(f'Erro: {str(e)}', 'ERROR')
-            self.finished.emit(False, f'Erro: {str(e)}')
-
-        finally:
-            if self.browser_manager:
-                self.browser_manager.close()
-
-    def _get_certificate_class(self):
-        """Get certificate class based on type."""
-        classes = {
-            'FGTS': FGTSCertificate,
-            'ESTADUAL': EstadualCertificate,
-            'RECEITA FEDERAL': FederalCertificate,
-            'TRABALHISTA': TrabalhistaCertificate,
-            'SIMPLES NACIONAL': SimplesNacionalCertificate,
-            'TCE-PR': TCECertificate
-        }
-        return classes.get(self.cert_type)
-
-
 class MainWindow(QMainWindow):
     """Main application window."""
 
@@ -99,7 +29,6 @@ class MainWindow(QMainWindow):
         self.logger = get_logger('MainWindow')
         self.config = get_config()
         self.cnpj = None
-        self.worker = None
         self._setup_ui()
 
         # Get CNPJ on startup
@@ -222,15 +151,7 @@ class MainWindow(QMainWindow):
         """Generate a single certificate."""
         extra_data = {}
 
-        # Check if CAPTCHA is needed
-        if cert_type in ['FGTS', 'TRABALHISTA']:
-            captcha = CaptchaDialog.get_captcha(self, cert_type)
-            if not captcha:
-                self._log('Geração cancelada: CAPTCHA não fornecido', 'WARNING')
-                return
-            extra_data['captcha'] = captcha
-
-        # Check if start date is needed (Federal)
+        # Only ask for start date upfront (doesn't need to see screen)
         if cert_type == 'RECEITA FEDERAL':
             start_date = DateDialog.get_start_date(self)
             if not start_date:
@@ -238,19 +159,58 @@ class MainWindow(QMainWindow):
                 return
             extra_data['start_date'] = start_date
 
+        # Create CAPTCHA callback only for certificates that need it
+        # FGTS no longer requires CAPTCHA
+        if cert_type in ['TRABALHISTA']:
+            def request_captcha_callback():
+                from PySide6.QtWidgets import QApplication
+                QApplication.processEvents()  # Keep UI responsive
+                captcha = CaptchaDialog.get_captcha(self, cert_type)
+                return captcha
+
+            extra_data['captcha_callback'] = request_captcha_callback
+
         # Disable UI during execution
         self._set_ui_enabled(False)
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)  # Indeterminate
 
-        # Create and start worker
-        self.worker = CertificateWorker(cert_type, self.cnpj, extra_data)
-        self.worker.finished.connect(self._on_worker_finished)
-        self.worker.log_message.connect(self._log)
-        self.worker.start()
+        # Execute synchronously to allow interactive CAPTCHA input
+        try:
+            self._log(f'Iniciando geração: {cert_type}', 'INFO')
+
+            browser_manager = BrowserManager()
+            page = browser_manager.start()
+
+            cert_class = self._get_certificate_class(cert_type)
+            if cert_class:
+                certificate = cert_class(self.cnpj, page, extra_data)
+                success = certificate.generate()
+
+                if success:
+                    self._log(f'Certidão {cert_type} gerada com sucesso!', 'SUCCESS')
+                    QMessageBox.information(self, 'Sucesso', f'Certidão {cert_type} gerada com sucesso!')
+                else:
+                    self._log(f'Falha ao gerar certidão {cert_type}', 'ERROR')
+                    QMessageBox.warning(self, 'Erro', f'Falha ao gerar certidão {cert_type}')
+            else:
+                self._log(f'Tipo de certidão inválido: {cert_type}', 'ERROR')
+
+            browser_manager.close()
+
+        except Exception as e:
+            self.logger.error(f'Error in certificate generation: {e}', exc_info=True)
+            self._log(f'Erro: {str(e)}', 'ERROR')
+            QMessageBox.warning(self, 'Erro', f'Erro: {str(e)}')
+
+        finally:
+            self._set_ui_enabled(True)
+            self.progress_bar.setVisible(False)
 
     def _generate_all(self):
         """Generate all certificates sequentially."""
+        from PySide6.QtWidgets import QApplication
+
         self._log('Iniciando geração de todas as certidões...', 'INFO')
 
         cert_types = [
@@ -258,29 +218,10 @@ class MainWindow(QMainWindow):
             'TRABALHISTA', 'SIMPLES NACIONAL', 'TCE-PR'
         ]
 
-        # Get all required data upfront
-        extra_data_map = {}
-
-        # CAPTCHA for FGTS
-        captcha = CaptchaDialog.get_captcha(self, 'FGTS')
-        if captcha:
-            extra_data_map['FGTS'] = {'captcha': captcha}
-        else:
-            self._log('FGTS será pulado: CAPTCHA não fornecido', 'WARNING')
-
-        # Start date for Federal
+        # Only ask for start date upfront (Federal)
         start_date = DateDialog.get_start_date(self)
-        if start_date:
-            extra_data_map['RECEITA FEDERAL'] = {'start_date': start_date}
-        else:
+        if not start_date:
             self._log('Receita Federal será pulada: Data não fornecida', 'WARNING')
-
-        # CAPTCHA for Trabalhista
-        captcha = CaptchaDialog.get_captcha(self, 'TRABALHISTA')
-        if captcha:
-            extra_data_map['TRABALHISTA'] = {'captcha': captcha}
-        else:
-            self._log('Trabalhista será pulada: CAPTCHA não fornecido', 'WARNING')
 
         # Generate each certificate
         self._set_ui_enabled(False)
@@ -289,16 +230,28 @@ class MainWindow(QMainWindow):
 
         success_count = 0
         for i, cert_type in enumerate(cert_types):
-            if cert_type not in extra_data_map and cert_type in ['FGTS', 'RECEITA FEDERAL', 'TRABALHISTA']:
-                self._log(f'Pulando {cert_type}', 'WARNING')
-                continue
-
             self._log(f'[{i+1}/{len(cert_types)}] Gerando {cert_type}...', 'INFO')
             self.progress_bar.setValue(i)
+            QApplication.processEvents()  # Keep UI responsive
 
-            extra_data = extra_data_map.get(cert_type, {})
+            extra_data = {}
 
-            # Synchronous generation for batch mode
+            # Add start date for Federal
+            if cert_type == 'RECEITA FEDERAL':
+                if not start_date:
+                    self._log('Pulando Receita Federal', 'WARNING')
+                    continue
+                extra_data['start_date'] = start_date
+
+            # Create CAPTCHA callback for certs that need it
+            # FGTS no longer requires CAPTCHA
+            if cert_type in ['TRABALHISTA']:
+                def request_captcha_callback(ct=cert_type):  # Capture cert_type
+                    QApplication.processEvents()
+                    return CaptchaDialog.get_captcha(self, ct)
+                extra_data['captcha_callback'] = request_captcha_callback
+
+            # Execute certificate generation
             try:
                 browser_manager = BrowserManager()
                 page = browser_manager.start()
@@ -342,16 +295,6 @@ class MainWindow(QMainWindow):
         }
         return classes.get(cert_type)
 
-    def _on_worker_finished(self, success: bool, message: str):
-        """Handle worker thread completion."""
-        self._set_ui_enabled(True)
-        self.progress_bar.setVisible(False)
-
-        if success:
-            QMessageBox.information(self, 'Sucesso', message)
-        else:
-            QMessageBox.warning(self, 'Erro', message)
-
     def _set_ui_enabled(self, enabled: bool):
         """Enable or disable UI controls."""
         self.start_button.setEnabled(enabled)
@@ -376,7 +319,8 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         """Handle window close event."""
-        if self.worker and self.worker.isRunning():
+        # Check if automation is running (buttons disabled)
+        if not self.start_button.isEnabled():
             reply = QMessageBox.question(
                 self,
                 'Confirmação',
@@ -385,7 +329,6 @@ class MainWindow(QMainWindow):
             )
 
             if reply == QMessageBox.Yes:
-                self.worker.terminate()
                 event.accept()
             else:
                 event.ignore()

@@ -2,7 +2,7 @@
   "version": "4.0",
   "urls": {
     "fgts": "https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf",
-    "estadual": "http://www.cdw.fazenda.pr.gov.br/cdw/emissao/certidaoAutomatica",
+    "estadual": "https://cdwfazenda.paas.pr.gov.br/cdwportal/certidao/automatica",
     "federal": "https://solucoes.receita.fazenda.gov.br/Servicos/certidaointernet/PJ/Consultar",
     "trabalhista": "https://www.tst.jus.br/certidao1",
     "trabalhista_direct": "https://cndt-certidao.tst.jus.br/gerarCertidao.faces",
@@ -11,19 +11,19 @@
   },
   "selectors": {
     "fgts": {
-      "cnpj_input": "#mainForm\\:txtInscricao1",
-      "captcha_input": "#mainForm\\:txtCaptcha",
-      "submit_button": "#mainForm\\:btnConsultar",
+      "cnpj_input": "[id='mainForm:txtInscricao1']",
+      "submit_button": "role=button[name='Consultar']",
       "error_message": "#mainForm > div.ui-messages-error",
       "razao_social": "#mainForm > div:nth-of-type(3) > p > span:nth-of-type(2)",
-      "checkbox": "#mainForm\\:j_id51",
-      "download_button": "#mainForm\\:btnVisualizar"
+      "checkbox": "[id='mainForm:j_id51']",
+      "visualizar_button": "[id='mainForm:btnVisualizar']",
+      "print_button": "[id='mainForm:btImprimir4']"
     },
     "estadual": {
-      "cnpj_input": "#EmissaoCnpj",
-      "submit_button": "#submitBtn",
-      "error_message": "#msg",
-      "download_link": "#pdf a"
+      "cnpj_input": "role=textbox[name='CPF ou CNPJ do requerente']",
+      "submit_button": "button:has-text('EMITIR CERTIDÃO')",
+      "modal_table": "table tbody tr",
+      "download_button": "i:has-text('file_save')"
     },
     "federal": {
       "cnpj_input": "input[name='ni']",
@@ -33,9 +33,9 @@
       "download_link": "a[href*='certidao']"
     },
     "trabalhista": {
-      "cnpj_input": "#gerarCertidaoForm\\:cpfCnpj",
+      "cnpj_input": "[id='gerarCertidaoForm:cpfCnpj']",
       "captcha_input": "#idCampoResposta",
-      "submit_button": "#gerarCertidaoForm\\:btnEmitirCertidao",
+      "submit_button": "[id='gerarCertidaoForm:btnEmitirCertidao']",
       "error_message": "#mensagens li",
       "success_indicator": "embed[type='application/pdf']"
     },
@@ -51,10 +51,10 @@
     }
   },
   "timeouts": {
-    "default_wait": 10000,
+    "default_wait": 30000,
     "download_wait": 30000,
     "captcha_wait": 120000,
-    "page_load": 15000
+    "page_load": 30000
   },
   "paths": {
     "downloads": "./downloads",

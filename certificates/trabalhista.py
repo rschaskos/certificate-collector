@@ -38,10 +38,17 @@ class TrabalhistaCertificate(BaseCertificate):
                 if not self.fill_input(self.selectors['cnpj_input'], self.cnpj):
                     return False
 
-                # Get CAPTCHA from user (will be provided by GUI)
-                captcha = self.extra_data.get('captcha')
+                # Request CAPTCHA from user via callback (page is visible now)
+                captcha_callback = self.extra_data.get('captcha_callback')
+                if not captcha_callback:
+                    self.logger.error('CAPTCHA callback not provided')
+                    return False
+
+                self.logger.info('Aguardando CAPTCHA do usuário...')
+                captcha = captcha_callback()
+
                 if not captcha:
-                    self.logger.error('CAPTCHA not provided')
+                    self.logger.warning('CAPTCHA not provided by user')
                     return False
 
                 # Fill CAPTCHA

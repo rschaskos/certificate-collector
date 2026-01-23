@@ -183,7 +183,10 @@ class BaseCertificate(ABC):
         """
         try:
             self.logger.info(f'Navigating to {self.url}')
-            self.page.goto(self.url, wait_until='domcontentloaded')
+            self.page.goto(self.url, wait_until='domcontentloaded', timeout=30000)
+            # Wait a bit more for dynamic content
+            self.page.wait_for_timeout(1000)
+            self.logger.debug('Page loaded successfully')
             return True
         except Exception as e:
             self.logger.error(f'Failed to navigate to {self.url}: {e}')

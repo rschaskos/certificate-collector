@@ -26,32 +26,44 @@ class EstadualCertificate(BaseCertificate):
             if not self.navigate():
                 return False
 
+            # Wait for the form to load
+            if not self.wait_for_selector(self.selectors['cnpj_input'], timeout=10000):
+                self.logger.error('CNPJ input field not found')
+                self.take_screenshot('estadual_no_cnpj_input')
+                return False
+
             # Fill CNPJ
             if not self.fill_input(self.selectors['cnpj_input'], self.cnpj):
                 return False
 
-            # Click submit
+            # Click submit button
             if not self.click_element(self.selectors['submit_button']):
                 return False
 
-            # Wait for response
-            self.page.wait_for_load_state('networkidle', timeout=10000)
-
-            # Check for error message
-            error_msg = self.check_error_message(self.selectors['error_message'])
-            if error_msg:
-                self.logger.error(f'CNPJ validation error: {error_msg}')
+            # Wait for modal with table to appear
+            self.logger.info('Waiting for certificates modal...')
+            if not self.wait_for_selector(self.selectors['modal_table'], timeout=15000):
+                self.logger.error('Modal with certificates table not found')
+                self.take_screenshot('estadual_no_modal')
                 return False
 
-            # Wait for and click download link
-            if not self.wait_for_selector(self.selectors['download_link'], timeout=5000):
-                self.logger.error('Download link not found')
-                self.take_screenshot('estadual_no_download_link')
+            # Take screenshot for debugging
+            self.take_screenshot('estadual_after_submit')
+
+            # Wait a moment for table to fully render
+            self.page.wait_for_timeout(1000)
+
+            # Click download button of first row (most recent certificate)
+            download_button = self.selectors['download_button']
+            if not self.wait_for_selector(download_button, timeout=5000):
+                self.logger.error('Download button not found')
+                self.take_screenshot('estadual_no_download_button')
                 return False
 
             # Download PDF
+            self.logger.info('Clicking download button...')
             with self.page.expect_download(timeout=self.config.get_timeout('download_wait')) as download_info:
-                self.page.click(self.selectors['download_link'])
+                self.page.locator(download_button).first.click()
 
             download = download_info.value
             timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')

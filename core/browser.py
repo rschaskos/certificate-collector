@@ -35,7 +35,7 @@ class BrowserManager:
         try:
             # Determine headless mode
             if headless is None:
-                headless = not self.config.get_setting('browser_headless', False)
+                headless = self.config.get_setting('browser_headless', False)
 
             self.logger.info(f'Starting browser (headless={headless})')
 
