@@ -1,2 +1,5 @@
-2026/01/23-16:53:48.180 48d4 Creating DB C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\Asset Store\assets.db since it was missing.
-2026/01/23-16:53:48.248 48d4 Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\Asset Store\assets.db/MANIFEST-000001
+2026/01/23-16:55:28.678 2be8 Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\Asset Store\assets.db/MANIFEST-000001
+2026/01/23-16:55:28.701 2be8 Recovering log #3
+2026/01/23-16:55:28.708 2be8 Level-0 table #3: started
+2026/01/23-16:55:28.754 2be8 Level-0 table #3: 346721 bytes OK
+2026/01/23-16:55:28.777 2be8 Delete type=0 #3

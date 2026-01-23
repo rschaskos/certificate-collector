@@ -11,7 +11,7 @@
 | FGTS | ✅ Funcionando | Sem CAPTCHA, usa `page.pdf()` |
 | ESTADUAL | ✅ Funcionando | Modal com tabela, download via ícone `file_save` |
 | RECEITA FEDERAL | 🔄 Em andamento | Site detecta automação - testar com Selenium/undetected-chromedriver |
-| TRABALHISTA | ⏳ Pendente | Testar (tem CAPTCHA) |
+| TRABALHISTA | ✅ Funcionando | CAPTCHA manual + download automático |
 | SIMPLES NACIONAL | ⏳ Pendente | Testar |
 | TCE-PR | ⏳ Pendente | Testar |
 
@@ -105,6 +105,29 @@
   "submit_button": "button:has-text('EMITIR CERTIDÃO')",
   "modal_table": "table tbody tr",
   "download_button": "i:has-text('file_save')"
+}
+```
+
+---
+
+## Fluxo Trabalhista (Completo)
+
+```
+1. Navega para URL direta: cndt-certidao.tst.jus.br/gerarCertidao.faces
+2. Preenche CNPJ (slow_type)
+3. Abre diálogo para usuário digitar CAPTCHA
+4. Preenche CAPTCHA (lowercase)
+5. Clica "Emitir Certidão" e aguarda download
+6. Salva PDF baixado
+```
+
+### Seletores Trabalhista (config.json)
+```json
+"trabalhista": {
+  "cnpj_input": "[id='gerarCertidaoForm:cpfCnpj']",
+  "captcha_input": "#idCampoResposta",
+  "submit_button": "[id='gerarCertidaoForm:btnEmitirCertidao']",
+  "error_message": "#mensagens li"
 }
 ```
 

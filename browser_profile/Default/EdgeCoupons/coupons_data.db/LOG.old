@@ -1,5 +1,6 @@
-2026/01/23-16:53:48.177 478c Creating DB C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db since it was missing.
-2026/01/23-16:53:48.191 478c Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
-2026/01/23-16:53:48.439 b34 Level-0 table #5: started
-2026/01/23-16:53:48.450 b34 Level-0 table #5: 681273 bytes OK
-2026/01/23-16:53:48.454 b34 Delete type=0 #3
+2026/01/23-16:55:28.682 3a98 Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/01/23-16:55:28.683 3a98 Recovering log #4
+2026/01/23-16:55:28.684 3a98 Reusing old log C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/000004.log 
+2026/01/23-16:55:28.807 2414 Level-0 table #8: started
+2026/01/23-16:55:28.820 2414 Level-0 table #8: 681376 bytes OK
+2026/01/23-16:55:28.825 2414 Delete type=0 #4

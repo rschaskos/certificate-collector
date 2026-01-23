@@ -1,2 +1,3 @@
-2026/01/23-16:53:43.903 d94 Creating DB C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\Local Storage\leveldb since it was missing.
-2026/01/23-16:53:43.935 d94 Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/01/23-16:55:25.884 40cc Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\Local Storage\leveldb/MANIFEST-000001
+2026/01/23-16:55:25.892 40cc Recovering log #3
+2026/01/23-16:55:25.896 40cc Reusing old log C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\Local Storage\leveldb/000003.log 

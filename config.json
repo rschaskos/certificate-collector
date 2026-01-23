@@ -35,8 +35,7 @@
       "cnpj_input": "[id='gerarCertidaoForm:cpfCnpj']",
       "captcha_input": "#idCampoResposta",
       "submit_button": "[id='gerarCertidaoForm:btnEmitirCertidao']",
-      "error_message": "#mensagens li",
-      "success_indicator": "embed[type='application/pdf']"
+      "error_message": "#mensagens li"
     },
     "simples": {
       "cnpj_input": "input[name='txtCNPJ']",
