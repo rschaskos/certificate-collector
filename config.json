@@ -7,7 +7,7 @@
     "trabalhista": "https://www.tst.jus.br/certidao1",
     "trabalhista_direct": "https://cndt-certidao.tst.jus.br/gerarCertidao.faces",
     "simples": "https://www8.receita.fazenda.gov.br/simplesnacional/aplicacoes.aspx?id=21",
-    "tce": "https://www1.tce.pr.gov.br/conteudo/consultar-certidao-liberatoria/235540/area/54"
+    "tce": "https://www1.tce.pr.gov.br/para-o-fiscalizado/servicos/certidoes/certidao-liberatoria/consultar-certidao-liberatoria.htm"
   },
   "selectors": {
     "fgts": {
@@ -43,9 +43,9 @@
       "gerar_pdf_button": "#GerarPDF"
     },
     "tce": {
-      "cnpj_input": "input[id*='cnpj']",
-      "consultar_button": "input[type='submit'][value*='Consultar']",
-      "emitir_button": "input[type='button'][value*='Emitir']"
+      "cnpj_input": "#ctl00_ContentPlaceHolder2_tbCNPJ",
+      "consultar_button": "#ctl00_ContentPlaceHolder2_btnVerificar",
+      "certidao_link": "#ctl00_ContentPlaceHolder2_lkCertidao"
     }
   },
   "timeouts": {

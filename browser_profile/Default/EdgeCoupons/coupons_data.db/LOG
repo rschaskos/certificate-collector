@@ -1,6 +1,15 @@
-2026/01/23-17:33:52.111 20bc Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
-2026/01/23-17:33:52.112 20bc Recovering log #23
-2026/01/23-17:33:52.114 20bc Reusing old log C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/000023.log 
-2026/01/23-17:33:52.230 3b28 Level-0 table #27: started
-2026/01/23-17:33:52.236 3b28 Level-0 table #27: 681376 bytes OK
-2026/01/23-17:33:52.240 3b28 Delete type=0 #23
+2026/01/26-12:11:05.951 2b20 Reusing MANIFEST C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/01/26-12:11:05.952 2b20 Recovering log #42
+2026/01/26-12:11:05.953 2b20 Reusing old log C:\Users\roney.gabinete\Documents\certificate-collector\browser_profile\Default\EdgeCoupons/coupons_data.db/000042.log 
+2026/01/26-12:11:06.040 1d70 Level-0 table #46: started
+2026/01/26-12:11:06.047 1d70 Level-0 table #46: 681376 bytes OK
+2026/01/26-12:11:06.050 1d70 Delete type=0 #42
+2026/01/26-12:11:06.052 920 Compacting 4@0 + 1@1 files
+2026/01/26-12:11:06.064 920 Generated table #47@0: 3 keys, 681376 bytes
+2026/01/26-12:11:06.064 920 Compacted 4@0 + 1@1 files => 681376 bytes
+2026/01/26-12:11:06.066 920 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/01/26-12:11:06.067 920 Delete type=2 #34
+2026/01/26-12:11:06.067 920 Delete type=2 #37
+2026/01/26-12:11:06.067 920 Delete type=2 #40
+2026/01/26-12:11:06.067 920 Delete type=2 #43
+2026/01/26-12:11:06.067 920 Delete type=2 #46

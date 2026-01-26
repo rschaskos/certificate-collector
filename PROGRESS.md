@@ -1,6 +1,6 @@
 # Progresso do Projeto - Certificate Collector
 
-**Última atualização:** 23/01/2026
+**Última atualização:** 26/01/2026
 
 ---
 
@@ -13,7 +13,7 @@
 | RECEITA FEDERAL | 🔄 Em andamento | Site detecta automação - testar com Selenium/undetected-chromedriver |
 | TRABALHISTA | ✅ Funcionando | CAPTCHA manual + download automático |
 | SIMPLES NACIONAL | ❌ Bloqueado | Site detecta automação - "Comportamento de Robô" |
-| TCE-PR | ⏳ Pendente | Testar |
+| TCE-PR | ✅ Funcionando | Formulário em iframe, link abre nova aba, salva via `page.pdf()` |
 
 ---
 
@@ -133,6 +133,36 @@
 
 ---
 
+## Fluxo TCE-PR (Completo)
+
+```
+1. Navega para página (formulário está dentro de iframe)
+2. Detecta iframe e localiza campos
+3. Preenche CNPJ (segundo input de texto no iframe)
+4. Clica "Consultar"
+5. Aguarda link "Clique aqui para visualizar a certidão." aparecer (dentro do iframe)
+6. Extrai URL do link (srv_certidao_emissao.aspx?nrCNPJ=...)
+7. Abre nova página com a URL da certidão
+8. Lida com dialog "Deseja imprimir?" (dismiss)
+9. Salva página como PDF via page.pdf()
+```
+
+### Seletores TCE-PR (config.json)
+```json
+"tce": {
+  "cnpj_input": "#ctl00_ContentPlaceHolder2_tbCNPJ",
+  "consultar_button": "#ctl00_ContentPlaceHolder2_btnVerificar",
+  "certidao_link": "#ctl00_ContentPlaceHolder2_lkCertidao"
+}
+```
+
+**Observações:**
+- Formulário está dentro de um **iframe**
+- O link da certidão aparece **dentro do iframe** após consulta
+- URL da certidão: `https://servicos.tce.pr.gov.br/TCEPR/Tribunal/CertidaoLiberatoria/srv_certidao_emissao.aspx?nrCNPJ={cnpj}`
+
+---
+
 ## Problema: Simples Nacional
 
 **Status:** Bloqueado por detecção de bot (hCaptcha)
@@ -202,7 +232,7 @@ certificate-collector/
 │   ├── federal.py          # 🔄 Bloqueado por detecção
 │   ├── trabalhista.py      # ✅ Funcionando
 │   ├── simples.py          # ❌ Bloqueado por detecção
-│   └── tce.py              # ⏳ Testar
+│   └── tce.py              # ✅ Funcionando
 ├── core/
 │   ├── browser.py          # Gerenciador do Playwright (anti-detecção)
 │   ├── config.py           # Carrega config.json
@@ -221,7 +251,7 @@ certificate-collector/
 2. [x] Testar certidão TRABALHISTA (com CAPTCHA) - ✅ Funcionando
 3. [ ] **PAUSADO** - Certidão RECEITA FEDERAL (detecção de bot)
 4. [ ] **PAUSADO** - Certidão SIMPLES NACIONAL (detecção de bot)
-5. [ ] Testar certidão TCE-PR
+5. [x] Testar certidão TCE-PR - ✅ Funcionando
 6. [ ] Voltar para FEDERAL e SIMPLES com Selenium/undetected-chromedriver
 
 ---
