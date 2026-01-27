@@ -1,0 +1,36 @@
+{
+   "action": {
+      "default_popup": ""
+   },
+   "background": {
+      "service_worker": "BackgroundServiceWorker.js"
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "ContentMain.js" ],
+      "match_about_blank": true,
+      "matches": [ "http://*/*", "https://*/*", "file://*/*" ],
+      "run_at": "document_start"
+   } ],
+   "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+   },
+   "default_locale": "en",
+   "description": "UiPath component for browser interaction",
+   "externally_connectable": {
+      "matches": [ "*://*.uipath.com/*" ]
+   },
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "uiPath128.png",
+      "16": "uiPath16.png",
+      "32": "uiPath32.png",
+      "48": "uiPath48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyRov6zdFTam/S1gfgA09tkj+tyuGaDR8Uff5/PN77j9PgP5ZHo3JGop8X0eVwcYpU+aK05rg9Q39JXf+RA4LqzpvZ+rP8dMz1tX1ZMgr2XqgDSJGWa5+w7PtIhlGKvRXIMvY6cTgRMYvIJNB7XPk0icuvDftw8ENh4HtMOO9UcZtL07FjFHjZPvyA/sa8hwJvOj1hYnJ1hVFboV5quYwTP8csmM+oqVo07jULPSUl93iUZFd8xXCY2kXJv7/cC2fKua1XfUKYujUQwwbiVZQBbD6o/gUkZ0iyqbfNviX/qBI780Z9dTuby26w3hCTAE7uDyrBq43W1US1UKPFVTJBwIDAQAB",
+   "manifest_version": 3,
+   "name": "UiPath Web Automation 22.10",
+   "permissions": [ "management", "nativeMessaging", "tabs", "webNavigation", "debugger", "cookies", "scripting" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "22.10.6"
+}

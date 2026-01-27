@@ -19,34 +19,55 @@
 
 ## Problema: Certidão Federal (Receita Federal)
 
-**Status:** Bloqueado por detecção de bot
+**Status:** 🔄 Em investigação - Site detecta QUALQUER automação
 
 **URL:** `https://servicos.receitafederal.gov.br/servico/certidoes/#/home/cnpj`
 
-**Erro:** "Não foi possível concluir a ação para o contribuinte informado. Por favor, tente novamente dentro de alguns minutos."
+**Erro:** "Não foi possível concluir a ação para o contribuinte informado. Por favor, tente novamente dentro de alguns minutos. 023"
 
-**O que já foi tentado:**
-1. ✅ Seletores funcionando (CNPJ preenchido, botões clicados)
-2. ❌ Chromium padrão - detectado
-3. ❌ Chrome real (`channel='chrome'`) - detectado
-4. ❌ Edge real (`channel='msedge'`) - detectado
-5. ❌ Perfil persistente (`launch_persistent_context`) - detectado
-6. ❌ Scripts anti-detecção (webdriver, plugins, etc.) - detectado
+### Descoberta importante (26/01/2026):
+✅ **Funciona manualmente** - Quando o usuário abre o Chrome real com perfil real e interage manualmente, a certidão é emitida sem problemas.
 
-**Próximos passos para resolver:**
-- [ ] Testar com Selenium + undetected-chromedriver
-- [ ] Testar com perfil de usuário real do Edge/Chrome
-- [ ] Investigar se há API pública da Receita Federal
+❌ **Falha com automação** - Mesmo usando:
+- Perfil real do Chrome
+- PyAutoGUI (controle nativo de mouse/teclado do SO)
+- undetected-chromedriver
 
-**Fluxo implementado (funciona até ser bloqueado):**
-```
-1. Preenche CNPJ (slow_type)
-2. Clica "Consultar Certidão" (botão secundário)
-3. Aguarda campo de data aparecer
-4. Preenche data inicial (do diálogo PySide)
-5. Clica "Consultar Certidão" (submit)
-6. Salva PDF
-```
+O site ainda detecta e bloqueia.
+
+### O que foi tentado (em ordem):
+
+| # | Técnica | Resultado |
+|---|---------|-----------|
+| 1 | Playwright padrão | ❌ Detectado |
+| 2 | Playwright + Chrome real | ❌ Detectado |
+| 3 | Playwright + Edge real | ❌ Detectado |
+| 4 | Playwright + perfil persistente | ❌ Detectado |
+| 5 | Scripts anti-detecção (webdriver, plugins) | ❌ Detectado |
+| 6 | undetected-chromedriver | ❌ Detectado |
+| 7 | undetected-chromedriver + perfil novo | ❌ Detectado |
+| 8 | PyAutoGUI (input nativo) + perfil novo | ❌ Detectado |
+| 9 | Chrome manual + perfil real + interação manual | ✅ **FUNCIONA** |
+
+### Análise técnica:
+
+O site da Receita Federal utiliza **múltiplas camadas de detecção**:
+
+1. **hCaptcha invisível** - Carregado em background (`hcaptcha.html` no console)
+2. **Análise comportamental** - Mesmo com input nativo (PyAutoGUI), detecta padrões
+3. **Fingerprinting do navegador** - Possivelmente detecta características do WebDriver
+4. **Verificação de sessão/cookies** - Perfil novo sem histórico é suspeito
+
+### Arquivos criados para testes:
+- `core/browser_undetected.py` - Gerenciador do undetected-chromedriver
+- `certificates/federal_undetected.py` - Múltiplos modos de teste (7 opções)
+
+### Próximos passos para resolver:
+- [ ] Investigar se o hCaptcha pode ser resolvido com serviço externo (2captcha, anti-captcha)
+- [ ] Testar com browser real via extensão (não WebDriver)
+- [ ] Investigar API pública da Receita Federal (se existir)
+- [ ] Considerar abordagem semi-manual (usuário resolve hCaptcha, automação continua)
+- [ ] Pesquisar técnicas de bypass de hCaptcha invisível
 
 **Seletores (config.json):**
 ```json
@@ -247,12 +268,19 @@ certificate-collector/
 
 ## Próximos Passos
 
-1. [x] Testar certidão ESTADUAL
+1. [x] Testar certidão ESTADUAL - ✅ Funcionando
 2. [x] Testar certidão TRABALHISTA (com CAPTCHA) - ✅ Funcionando
-3. [ ] **PAUSADO** - Certidão RECEITA FEDERAL (detecção de bot)
-4. [ ] **PAUSADO** - Certidão SIMPLES NACIONAL (detecção de bot)
-5. [x] Testar certidão TCE-PR - ✅ Funcionando
-6. [ ] Voltar para FEDERAL e SIMPLES com Selenium/undetected-chromedriver
+3. [x] Testar certidão TCE-PR - ✅ Funcionando
+4. [x] Testar undetected-chromedriver para FEDERAL - ❌ Ainda detectado
+5. [x] Testar PyAutoGUI (input nativo) para FEDERAL - ❌ Ainda detectado
+6. [ ] **EM ANÁLISE** - Certidão RECEITA FEDERAL (precisa solução mais robusta)
+7. [ ] **PAUSADO** - Certidão SIMPLES NACIONAL (mesmo problema - hCaptcha)
+
+### Ideias para solução profissional da Certidão Federal:
+- [ ] Usar serviço de resolução de CAPTCHA (2captcha, anti-captcha, capsolver)
+- [ ] Criar extensão do Chrome que injeta automação (não usa WebDriver)
+- [ ] Puppeteer com stealth plugin (alternativa ao Playwright)
+- [ ] Abordagem híbrida: automação prepara, usuário clica no botão crítico
 
 ---
 
