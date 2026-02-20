@@ -1,9 +1,30 @@
-# Core dependencies - v4.0
-PySide6>=6.6.0
-playwright>=1.40.0
+# ============================================================================
+# Certificate Collector v4.0 - Dependencies
+# ============================================================================
 
-# Legacy dependencies (will be removed)
-# selenium>=4.16.0
-# customtkinter>=5.2.0
-# pyautogui>=0.9.54
-# pygetwindow>=0.0.9
+# Core dependencies (Required)
+# ----------------------------------------------------------------------------
+PySide6>=6.6.0              # Qt6-based GUI framework
+playwright>=1.40.0          # Main browser automation engine
+
+# Undetected automation (Optional - for advanced scenarios)
+# ----------------------------------------------------------------------------
+nodriver>=0.38              # CDP-based automation without WebDriver flags
+                           # Used by: certificates/federal_nodriver.py
+
+# Visual automation dependencies (Optional - experimental features)
+# ----------------------------------------------------------------------------
+# Pillow>=10.0.0            # Image processing library
+# opencv-python>=4.8.0      # Computer vision library
+# numpy>=1.24.0             # Numerical computing library
+# pyautogui>=0.9.54         # GUI automation library
+# Used by: certificates/federal_visual.py, certificates/federal_pyautogui.py,
+#          core/visual_automation.py, tools/*
+
+# Legacy dependencies (Deprecated - v3.0 compatibility)
+# ----------------------------------------------------------------------------
+# selenium>=4.16.0          # Legacy browser automation
+# customtkinter>=5.2.0      # Legacy GUI framework
+# pygetwindow>=0.0.9        # Legacy window management
+# Used by: main_v3_backup.py, certificates/federal_undetected.py,
+#          core/browser_undetected.py

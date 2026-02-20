@@ -4,7 +4,7 @@ Sistema profissional de automação para emissão de Certidões de Regularidade 
 
 **Versão 4.0** - Refatorado com PySide6 + Playwright (2026)
 
-## 🎯 Certidões Suportadas
+## Certidões Suportadas
 
 O sistema gera automaticamente as seguintes certidões:
 
@@ -15,23 +15,23 @@ O sistema gera automaticamente as seguintes certidões:
 - **Simples Nacional** - Consulta Optantes pelo Simples Nacional
 - **TCE-PR** - Certidão Liberatória do Tribunal de Contas do Paraná
 
-## 🚀 Melhorias na Versão 4.0
+## Melhorias na Versão 4.0
 
-- ✅ **Interface moderna** com PySide6 (Qt6)
-- ✅ **Automação profissional** com Playwright (substitui PyAutoGUI)
-- ✅ **Arquitetura modular** orientada a objetos
-- ✅ **Sistema de logging** com arquivos diários
-- ✅ **Configuração externa** via config.json
-- ✅ **Tratamento de erros robusto** com retry automático
-- ✅ **Console em tempo real** na interface
-- ✅ **Cross-platform** (Windows, Linux, macOS)
+- **Interface moderna** com PySide6 (Qt6)
+- **Automação profissional** com Playwright (substitui PyAutoGUI)
+- **Arquitetura modular** orientada a objetos
+- **Sistema de logging** com arquivos diários
+- **Configuração externa** via config.json
+- **Tratamento de erros robusto** com retry automático
+- **Console em tempo real** na interface
+- **Cross-platform** (Windows, Linux, macOS)
 
-## 📋 Pré-requisitos
+## Pré-requisitos
 
 - **Python 3.8+**
 - Ambiente virtual (recomendado)
 
-## 🔧 Instalação
+## Instalação
 
 ### 1. Clone o repositório
 ```bash
@@ -69,7 +69,7 @@ pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-## ▶️ Como executar
+## Como executar
 
 Com o ambiente virtual ativado:
 
@@ -77,7 +77,7 @@ Com o ambiente virtual ativado:
 python main.py
 ```
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 certificate-collector/
@@ -108,7 +108,7 @@ certificate-collector/
 └── screenshots/               # Screenshots de debug (criado automaticamente)
 ```
 
-## 🎮 Como usar
+## Como usar
 
 1. **Execute o programa**: `python main.py`
 2. **Digite o CNPJ** da empresa na primeira janela
@@ -122,11 +122,11 @@ certificate-collector/
 
 Selecione "GERAR TODAS CERTIDÕES" para processar todas as 6 certidões em sequência. O sistema solicitará todos os CAPTCHAs e dados necessários no início.
 
-## 📝 Logs
+## Logs
 
 Logs detalhados são salvos em `logs/certidoes_YYYY-MM-DD.log` e também exibidos no console da interface em tempo real.
 
-## ⚙️ Configuração
+## Configuração
 
 Edite `config.json` para:
 - Alterar URLs dos sites governamentais
@@ -134,7 +134,7 @@ Edite `config.json` para:
 - Ajustar timeouts e número de tentativas
 - Modificar caminhos de download e logs
 
-## 🔄 Migração da v3.0
+## Migração da v3.0
 
 Se você usava a versão anterior (CustomTkinter + Selenium + PyAutoGUI), o código original foi preservado em `main_v3_backup.py`.
 
@@ -145,7 +145,7 @@ Se você usava a versão anterior (CustomTkinter + Selenium + PyAutoGUI), o cód
 - Código monolítico **refatorado** em módulos
 - Hardcoded Chrome path **removido**
 
-## 🐛 Solução de Problemas
+## Solução de Problemas
 
 ### Erro: "playwright not found"
 ```bash
@@ -164,7 +164,7 @@ Edite `config.json` → seção `selectors` → atualize o seletor CSS/XPath cor
 ### Timeout durante geração
 Edite `config.json` → seção `timeouts` → aumente os valores (em milissegundos).
 
-## 🤝 Contribuição
+## Contribuição
 
 1. Faça o fork do projeto
 2. Crie uma branch para a sua feature (`git checkout -b feature/nome-da-feature`)
@@ -172,7 +172,7 @@ Edite `config.json` → seção `timeouts` → aumente os valores (em milissegun
 4. Faça o push para a branch (`git push origin feature/nome-da-feature`)
 5. Crie um novo Pull Request
 
-## 📄 Licença
+## Licença
 
 Desenvolvido por **RSCHASKOS** (2024-2026)
 

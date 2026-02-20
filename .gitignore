@@ -65,3 +65,22 @@ downloads/
 temp/
 *.pdf
 browser_profile/
+browser_profile_federal/
+screenshots/
+logs/
+tools/
+
+# Experimental/WIP implementations (not used in production)
+certificates/federal_nodriver.py
+certificates/federal_pyautogui.py
+certificates/federal_visual.py
+certificates/federal_undetected.py
+core/browser_undetected.py
+core/visual_automation.py
+core/templates/
+
+# CLI
+.claude
+
+# internal
+PROGRESS.md
