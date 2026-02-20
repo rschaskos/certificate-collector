@@ -70,6 +70,7 @@ screenshots/
 logs/
 tools/
 
+
 # Experimental/WIP implementations (not used in production)
 certificates/federal_nodriver.py
 certificates/federal_pyautogui.py
