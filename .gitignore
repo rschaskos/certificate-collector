@@ -84,4 +84,4 @@ core/templates/
 .claude
 
 # internal
-PROGRESS.md
+PROGRESS.mdcertificates/*.backup*
